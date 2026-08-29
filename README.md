@@ -11,7 +11,9 @@ A Linux-based system programming project demonstrating efficient file access and
 | 2520080022  | Ch Karthikeya   |
 
 **Section:** 12
-**Team:** 15
+
+**Team:** 9
+
 **Supervisor:** M. Raghupathi
 
 ## Abstract
