@@ -85,4 +85,4 @@ A functional Linux application that allows users to open, read, modify, synchron
 **Course:** Operating Systems and Systems Programming
 **Course Code:** 25CS2104E
 **Academic Year:** 2026–27
-**Term:** I
+
