@@ -37,7 +37,7 @@ The system uses Linux system calls such as `open()`, `fstat()`, `mmap()`, `msync
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/DSriVarshini/OSSP-.git
+git clone https://github.com/ShreyasPanjala/KLH-AI-and-DS-2026-27-Team-9-Memory-Mapped-File-Management-System.git
 cd OSSP-/Project
 ```
 
@@ -66,11 +66,7 @@ gcc *.c -o mmap_manager
 | `munmap()`  | Removes the memory mapping         |
 | `close()`   | Closes the file                    |
 
-## Current Status
 
-**Phase: Development**
-
-The project has completed the problem definition, objectives, methodology, technology selection, and module allocation. Implementation and integration of the individual modules are currently in progress.
 
 ### Module Responsibilities
 
