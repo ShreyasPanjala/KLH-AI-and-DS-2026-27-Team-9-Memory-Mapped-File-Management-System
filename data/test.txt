@@ -1,0 +1,2 @@
+hello from memory mapped files!
+This file is accessed through mmap.
