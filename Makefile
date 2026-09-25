@@ -1,19 +1,28 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude
 
-TARGET = test_memory_mapper
+DEMO = memory_mapper_demo
+TEST = test_memory_mapper
 
-SOURCES = src/memory_mapper.c tests/test_memory_mapper.c
+MAPPER_SOURCE = src/memory_mapper.c
+MAIN_SOURCE = src/main.c
+TEST_SOURCE = tests/test_memory_mapper.c
 
-.PHONY: all test clean
+.PHONY: all demo test clean
 
-all: $(TARGET)
+all: $(DEMO) $(TEST)
 
-$(TARGET): $(SOURCES)
-	$(CC) $(CFLAGS) $(SOURCES) -o $(TARGET)
+$(DEMO): $(MAPPER_SOURCE) $(MAIN_SOURCE)
+	$(CC) $(CFLAGS) $(MAPPER_SOURCE) $(MAIN_SOURCE) -o $(DEMO)
 
-test: $(TARGET)
-	./$(TARGET)
+$(TEST): $(MAPPER_SOURCE) $(TEST_SOURCE)
+	$(CC) $(CFLAGS) $(MAPPER_SOURCE) $(TEST_SOURCE) -o $(TEST)
+
+demo: $(DEMO)
+	./$(DEMO)
+
+test: $(TEST)
+	./$(TEST)
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(DEMO) $(TEST)
