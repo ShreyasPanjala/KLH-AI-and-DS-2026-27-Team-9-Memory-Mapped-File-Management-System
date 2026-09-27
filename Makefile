@@ -1,28 +1,53 @@
 CC = gcc
+
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude
+LDFLAGS = -pthread
 
-DEMO = memory_mapper_demo
-TEST = test_memory_mapper
+SRC_DIR = src
+TEST_DIR = tests
 
-MAPPER_SOURCE = src/memory_mapper.c
-MAIN_SOURCE = src/main.c
-TEST_SOURCE = tests/test_memory_mapper.c
+DEMO_SOURCES = \
+	$(SRC_DIR)/main.c \
+	$(SRC_DIR)/memory_mapper.c \
+	$(SRC_DIR)/syscall_demo.c \
+	$(SRC_DIR)/process_demo.c \
+	$(SRC_DIR)/ipc_demo.c \
+	$(SRC_DIR)/vm_demo.c \
+	$(SRC_DIR)/file_demo.c \
+	$(SRC_DIR)/thread_demo.c
 
-.PHONY: all demo test clean
+DEMO_OBJECTS = $(DEMO_SOURCES:.c=.o)
 
-all: $(DEMO) $(TEST)
+TEST_SOURCES = \
+	$(SRC_DIR)/memory_mapper.c \
+	$(TEST_DIR)/test_memory_mapper.c
 
-$(DEMO): $(MAPPER_SOURCE) $(MAIN_SOURCE)
-	$(CC) $(CFLAGS) $(MAPPER_SOURCE) $(MAIN_SOURCE) -o $(DEMO)
+TEST_OBJECTS = $(TEST_SOURCES:.c=.o)
 
-$(TEST): $(MAPPER_SOURCE) $(TEST_SOURCE)
-	$(CC) $(CFLAGS) $(MAPPER_SOURCE) $(TEST_SOURCE) -o $(TEST)
+TARGET = os_demo
+TEST_TARGET = test_memory_mapper
 
-demo: $(DEMO)
-	./$(DEMO)
+.PHONY: all clean test demo
 
-test: $(TEST)
-	./$(TEST)
+all: $(TARGET) $(TEST_TARGET)
+
+demo: $(TARGET)
+	./$(TARGET)
+
+$(TARGET): $(DEMO_OBJECTS)
+	$(CC) $(CFLAGS) $(DEMO_OBJECTS) -o $(TARGET) $(LDFLAGS)
+
+$(TEST_TARGET): $(TEST_OBJECTS)
+	$(CC) $(CFLAGS) $(TEST_OBJECTS) -o $(TEST_TARGET)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+test: $(TEST_TARGET)
+	./$(TEST_TARGET)
 
 clean:
-	rm -f $(DEMO) $(TEST)
+	rm -f $(DEMO_OBJECTS) $(TEST_OBJECTS)
+	rm -f $(TARGET) $(TEST_TARGET)
+	rm -f data/syscall_test.txt
+	rm -f data/file_demo.txt

@@ -1,139 +1,136 @@
-#include "memory_mapper.h"
-
 #include <stdio.h>
-#include <sys/mman.h>
+#include <stdlib.h>
 
-int main(void)
+#include "syscall_demo.h"
+#include "process_demo.h"
+#include "ipc_demo.h"
+#include "vm_demo.h"
+#include "file_demo.h"
+#include "thread_demo.h"
+
+static void print_menu(void)
 {
-    const char *filename = "data/test.txt";
-    MappedFile mapped_file;
-
-    printf("========================================\n");
-    printf(" Linux Memory-Mapped File System Demo\n");
-    printf("========================================\n\n");
-
-    /* ------------------------------------------
-     * STEP 1: Read-only memory mapping
-     * ------------------------------------------ */
-    printf("[1] READ-ONLY MAPPING\n");
-    printf("----------------------------------------\n");
-
-    if (map_file(filename, PROT_READ, &mapped_file) != 0) {
-        fprintf(stderr, "Failed to map file for reading.\n");
-        return 1;
-    }
-
-    printf("File mapped successfully.\n");
-    printf("File size: %zu bytes\n", mapped_file.size);
-    printf("Mapped address: %p\n", mapped_file.address);
-
-    printf("\nFile contents through mapped memory:\n");
-    fwrite(mapped_file.address, 1, mapped_file.size, stdout);
     printf("\n");
+    printf("===============================================\n");
+    printf("       LINUX MEMORY-MAPPED FILE SYSTEM\n");
+    printf("          MANAGEMENT & TEST MODULE\n");
+    printf("===============================================\n");
+    printf("1. System Call Operations\n");
+    printf("2. Process Management\n");
+    printf("3. Inter-Process Communication\n");
+    printf("4. Memory Mapping\n");
+    printf("5. File Operations\n");
+    printf("6. Concurrent Access\n");
+    printf("7. Run Complete System Test\n");
+    printf("0. Exit\n");
+    printf("===============================================\n");
+    printf("Enter choice: ");
+}
 
-    if (unmap_file(&mapped_file) != 0) {
-        fprintf(stderr, "Failed to unmap read-only mapping.\n");
+static void run_choice(int choice)
+{
+    switch (choice)
+    {
+        case 1:
+            run_syscall_demo();
+            break;
+
+        case 2:
+            run_process_demo();
+            break;
+
+        case 3:
+            run_ipc_demo();
+            break;
+
+        case 4:
+            run_vm_demo();
+            break;
+
+        case 5:
+            run_file_demo();
+            break;
+
+        case 6:
+            run_thread_demo();
+            break;
+
+        case 7:
+            run_syscall_demo();
+            run_process_demo();
+            run_ipc_demo();
+            run_vm_demo();
+            run_file_demo();
+            run_thread_demo();
+
+            printf("\n");
+            printf("===============================================\n");
+            printf("       ALL SYSTEM TESTS COMPLETED\n");
+            printf("===============================================\n");
+            break;
+
+        default:
+            printf("Invalid choice.\n");
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    /*
+     * GUI mode:
+     * ./os_demo 1
+     * ./os_demo 2
+     * ...
+     * ./os_demo 7
+     */
+    if (argc == 2)
+    {
+        int choice = atoi(argv[1]);
+
+        if (choice >= 1 && choice <= 7)
+        {
+            run_choice(choice);
+            return 0;
+        }
+
+        printf("Invalid command-line option.\n");
         return 1;
     }
-
-    printf("\nRead-only mapping released successfully.\n\n");
-
-
-    /* ------------------------------------------
-     * STEP 2: Read-write memory mapping
-     * ------------------------------------------ */
-    printf("[2] READ-WRITE MAPPING\n");
-    printf("----------------------------------------\n");
-
-    if (map_file(filename, PROT_READ | PROT_WRITE, &mapped_file) != 0) {
-        fprintf(stderr, "Failed to map file for writing.\n");
-        return 1;
-    }
-
-    printf("Read-write mapping successful.\n");
-    printf("Mapped address: %p\n", mapped_file.address);
 
     /*
-     * Save the original first byte so that the
-     * demonstration does not permanently modify
-     * data/test.txt.
+     * Normal terminal mode
      */
-    char *data = (char *)mapped_file.address;
-    char original_character = data[0];
+    int choice;
 
-    printf("Original first character: '%c'\n", original_character);
-
-    /*
-     * Modify the file through mapped memory.
-     */
-    if (data[0] >= 'a' && data[0] <= 'z') {
-        data[0] = data[0] - ('a' - 'A');
-    } else if (data[0] >= 'A' && data[0] <= 'Z') {
-        data[0] = data[0] + ('a' - 'A');
-    } else {
-        data[0] = 'X';
-    }
-
-    printf("Modified first character: '%c'\n", data[0]);
-
-    /* Synchronize mapped memory with the file. */
-    if (sync_file(&mapped_file) != 0) {
-        fprintf(stderr, "msync() failed.\n");
-        unmap_file(&mapped_file);
-        return 1;
-    }
-
-    printf("msync() completed successfully.\n");
-
-    /*
-     * Restore the original character so the demonstration
-     * does not permanently change data/test.txt.
-     */
-    data[0] = original_character;
-
-    if (sync_file(&mapped_file) != 0) {
-        fprintf(stderr, "Failed to restore original file contents.\n");
-        unmap_file(&mapped_file);
-        return 1;
-    }
-
-    printf("Original file contents restored.\n");
-
-    if (unmap_file(&mapped_file) != 0) {
-        fprintf(stderr, "Failed to release read-write mapping.\n");
-        return 1;
-    }
-
-    printf("Read-write mapping released successfully.\n\n");
-
-
-    /* ------------------------------------------
-     * STEP 3: Direct memory access
-     * ------------------------------------------ */
-    printf("[3] DIRECT MEMORY ACCESS\n");
-    printf("----------------------------------------\n");
-
-    if (map_file(filename, PROT_READ, &mapped_file) != 0) {
-        fprintf(stderr, "Failed to map file.\n");
-        return 1;
-    }
-
-    printf("First 10 bytes through mapped memory:\n");
-
-    size_t bytes_to_display =
-        mapped_file.size < 10 ? mapped_file.size : 10;
-
-    fwrite(mapped_file.address, 1, bytes_to_display, stdout);
     printf("\n");
+    printf("===============================================\n");
+    printf("       LINUX MEMORY-MAPPED FILE SYSTEM\n");
+    printf("          MANAGEMENT & TEST MODULE\n");
+    printf("===============================================\n");
 
-    if (unmap_file(&mapped_file) != 0) {
-        fprintf(stderr, "Failed to release mapping.\n");
-        return 1;
+    while (1)
+    {
+        print_menu();
+
+        if (scanf("%d", &choice) != 1)
+        {
+            printf("Invalid input. Please enter a number.\n");
+
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF)
+                ;
+
+            continue;
+        }
+
+        if (choice == 0)
+        {
+            printf("\nExiting system.\n");
+            break;
+        }
+
+        run_choice(choice);
     }
-
-    printf("\n========================================\n");
-    printf(" Memory-mapped file demo completed!\n");
-    printf("========================================\n");
 
     return 0;
 }
